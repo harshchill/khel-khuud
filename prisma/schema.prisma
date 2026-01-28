@@ -22,11 +22,25 @@ enum Role {
   ADMIN
 }
 
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum BookingStatus {
   PENDING // Payment initiated but not finished
   CONFIRMED // Payment successful
   CANCELLED // Refunded or user cancelled
   COMPLETED // Event has passed
+}
+
+enum PaymentStatus {
+  PENDING // Payment initiated but not completed
+  COMPLETED // Payment successful
+  FAILED // Payment failed
+  REFUNDED // Payment refunded
+  CANCELLED // Payment cancelled
 }
 
 enum SportType {
@@ -48,7 +62,7 @@ enum SportType {
 model User {
   id       String  @id @default(cuid())
   email    String  @unique
-  password String 
+  password String
   name     String
   phone    String
   avatar   String?
@@ -58,10 +72,12 @@ model User {
   updatedAt DateTime @updatedAt
 
   // RELATIONS for Owner
-  venues   Venue[]   @relation("OwnerVenues") 
+  venues   Venue[]   @relation("OwnerVenues")
 
   // Relation for customers
-  bookings Booking[] // If user is a Customer
+  bookings     Booking[] // If user is a Customer
+  payments     Payment[]
+  
 }
 
 model Venue {
@@ -75,15 +91,13 @@ model Venue {
   ownerId String
   owner   User   @relation("OwnerVenues", fields: [ownerId], references: [id])
 
-  
-  isApproved Boolean @default(false) 
+  isApproved ApprovalStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // RELATIONS
-  courts  Court[]
-  
+  courts Court[]
 }
 
 model Court {
@@ -119,10 +133,28 @@ model Booking {
   courtId String
   court   Court  @relation(fields: [courtId], references: [id])
 
+  payment Payment?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 
   @@unique([courtId, date, slotId])
 }
 
+model Payment {
+  id String @id @default(cuid())
+
+  amount       Decimal       @db.Decimal(10, 2)
+  status       PaymentStatus @default(PENDING)
+  paymentMethod String? // e.g., "CARD", "UPI", "WALLET"
+  transactionId String? @unique
+
+  bookingId String @unique
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

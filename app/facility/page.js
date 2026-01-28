@@ -1,7 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { getDashboardStats, addVenueAction } from "@/app/actions/venues";
 import { 
   Wallet, Users, Zap, Trophy, ArrowUpRight, 
   Bell, Plus, Filter, X, MapPin, Camera, AlignLeft, Globe, Search
@@ -11,32 +13,13 @@ import {
   Tooltip, ResponsiveContainer 
 } from 'recharts';
 
-// --- MOCK DATA ---
-const REVENUE_DATA = [
-  { name: 'Mon', rev: 4200 }, { name: 'Tue', rev: 3800 },
-  { name: 'Wed', rev: 6500 }, { name: 'Thu', rev: 8900 },
-  { name: 'Fri', rev: 7200 }, { name: 'Sat', rev: 11000 },
-  { name: 'Sun', rev: 12500 },
-];
-
-const PLAYERS = [
-  { name: "Arjun Sharma", sessions: 24, spend: "₹12,400", color: "bg-cyan-500" },
-  { name: "Sanya Malhotra", sessions: 18, spend: "₹9,200", color: "bg-violet-500" },
-  { name: "Rahul Verma", sessions: 15, spend: "₹7,800", color: "bg-emerald-500" },
-];
-
-const STATS = [
-  { label: "Total Revenue", value: "₹84,200", icon: Wallet, color: "text-cyan-500" },
-  { label: "Active Venues", value: "6", icon: Zap, color: "text-indigo-500" },
-  { label: "New Members", value: "42", icon: Users, color: "text-emerald-500" },
-  { label: "Top Venue", value: "Turf A", icon: Trophy, color: "text-orange-500" },
-];
-
 export default function FacilityDashboard() {
+  const { data: session, status } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Form state according to your PRISMA Model
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -45,19 +28,49 @@ export default function FacilityDashboard() {
     images: [] 
   });
 
+  // Fetch dashboard data
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchDashboardData();
+    }
+  }, [status]);
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    const result = await getDashboardStats();
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      setDashboardData(result);
+    }
+    setLoading(false);
+  };
+
   const handleConfirmVenue = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulation of API call
-    setTimeout(() => {
+    const result = await addVenueAction(formData);
+    
+    if (result.error) {
+      toast.error(result.error, {
+        style: { borderRadius: '16px', background: '#1e293b', color: '#fff', border: '2px solid #ef4444' },
+      });
+    } else {
       toast.success(`${formData.name} is now live!`, {
         style: { borderRadius: '16px', background: '#1e293b', color: '#fff', border: '2px solid #06b6d4' },
       });
-      setIsSubmitting(false);
       setIsModalOpen(false);
       setFormData({ name: "", description: "", address: "", city: "", images: [] });
-    }, 1500);
+      // Refresh dashboard data
+      await fetchDashboardData();
+    }
+    setIsSubmitting(false);
+  };
+
+  const getIconComponent = (iconName) => {
+    const icons = { Wallet, Zap, Users, Trophy };
+    return icons[iconName] || Wallet;
   };
 
   return (
@@ -108,23 +121,29 @@ export default function FacilityDashboard() {
 
         {/* 2. STATS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {STATS.map((stat, i) => (
-            <motion.div 
-              key={i} 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -8 }} 
-              className="bg-white p-7 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group"
-            >
-              <div className="absolute top-0 left-0 h-full w-1.5 bg-cyan-500 group-hover:bg-violet-600 transition-colors" />
-              <div className={`p-3 w-fit bg-gray-50 rounded-2xl mb-4 ${stat.color} group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-300`}>
-                <stat.icon size={24} />
-              </div>
-              <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
-              <h3 className="text-3xl font-black text-slate-800 mt-1">{stat.value}</h3>
-            </motion.div>
-          ))}
+          {loading ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-400">Loading stats...</p>
+            </div>
+          ) : dashboardData?.stats ? (
+            dashboardData.stats.map((stat, i) => (
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -8 }} 
+                className="bg-white p-7 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group"
+              >
+                <div className="absolute top-0 left-0 h-full w-1.5 bg-cyan-500 group-hover:bg-violet-600 transition-colors" />
+                <div className={`p-3 w-fit bg-gray-50 rounded-2xl mb-4 ${stat.color} group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-300`}>
+                  {React.createElement(getIconComponent(stat.icon), { size: 24 })}
+                </div>
+                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
+                <h3 className="text-3xl font-black text-slate-800 mt-1">{stat.value}</h3>
+              </motion.div>
+            ))
+          ) : null}
         </div>
 
         {/* 3. REVENUE CHART */}
@@ -137,20 +156,26 @@ export default function FacilityDashboard() {
             </div>
           </div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={REVENUE_DATA}>
-                <defs>
-                  <linearGradient id="cyanGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: '700'}} />
-                <Tooltip contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }} />
-                <Area type="monotone" dataKey="rev" stroke="#06b6d4" strokeWidth={5} fillOpacity={1} fill="url(#cyanGrad)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <div className="flex items-center justify-center h-full text-gray-400">
+                Loading chart data...
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={dashboardData?.revenueData || []}>
+                  <defs>
+                    <linearGradient id="cyanGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: '700'}} />
+                  <Tooltip contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }} />
+                  <Area type="monotone" dataKey="rev" stroke="#06b6d4" strokeWidth={5} fillOpacity={1} fill="url(#cyanGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </section>
 
@@ -161,21 +186,35 @@ export default function FacilityDashboard() {
           </div>
           <table className="w-full text-left">
             <tbody className="divide-y divide-gray-50">
-              {PLAYERS.map((p, i) => (
-                <tr key={i} className="hover:bg-cyan-50/30 transition-colors group">
-                  <td className="px-10 py-6 flex items-center gap-4">
-                    <div className={`w-11 h-11 rounded-2xl ${p.color} text-white flex items-center justify-center font-black shadow-lg shadow-gray-200`}>{p.name[0]}</div>
-                    <span className="font-bold text-slate-700 text-lg">{p.name}</span>
-                  </td>
-                  <td className="px-10 py-6">
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sessions</div>
-                    <div className="text-slate-600 font-black">{p.sessions} Slots</div>
-                  </td>
-                  <td className="px-10 py-6 text-right">
-                    <span className="px-4 py-2 bg-cyan-100 text-cyan-600 rounded-full font-black text-xs">{p.spend}</span>
+              {loading ? (
+                <tr>
+                  <td className="px-10 py-6 text-center text-gray-400 col-span-full">
+                    Loading top performers...
                   </td>
                 </tr>
-              ))}
+              ) : dashboardData?.topPerformers && dashboardData.topPerformers.length > 0 ? (
+                dashboardData.topPerformers.map((p, i) => (
+                  <tr key={i} className="hover:bg-cyan-50/30 transition-colors group">
+                    <td className="px-10 py-6 flex items-center gap-4">
+                      <div className={`w-11 h-11 rounded-2xl ${p.color} text-white flex items-center justify-center font-black shadow-lg shadow-gray-200`}>{p.name[0]}</div>
+                      <span className="font-bold text-slate-700 text-lg">{p.name}</span>
+                    </td>
+                    <td className="px-10 py-6">
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sessions</div>
+                      <div className="text-slate-600 font-black">{p.sessions} Slots</div>
+                    </td>
+                    <td className="px-10 py-6 text-right">
+                      <span className="px-4 py-2 bg-cyan-100 text-cyan-600 rounded-full font-black text-xs">{p.spend}</span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="px-10 py-6 text-center text-gray-400">
+                    No booking data available yet
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </section>

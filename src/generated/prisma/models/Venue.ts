@@ -31,7 +31,7 @@ export type VenueMinAggregateOutputType = {
   address: string | null
   city: string | null
   ownerId: string | null
-  isApproved: boolean | null
+  isApproved: $Enums.ApprovalStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -43,7 +43,7 @@ export type VenueMaxAggregateOutputType = {
   address: string | null
   city: string | null
   ownerId: string | null
-  isApproved: boolean | null
+  isApproved: $Enums.ApprovalStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -181,7 +181,7 @@ export type VenueGroupByOutputType = {
   city: string
   images: string[]
   ownerId: string
-  isApproved: boolean
+  isApproved: $Enums.ApprovalStatus
   createdAt: Date
   updatedAt: Date
   _count: VenueCountAggregateOutputType | null
@@ -215,7 +215,7 @@ export type VenueWhereInput = {
   city?: Prisma.StringFilter<"Venue"> | string
   images?: Prisma.StringNullableListFilter<"Venue">
   ownerId?: Prisma.StringFilter<"Venue"> | string
-  isApproved?: Prisma.BoolFilter<"Venue"> | boolean
+  isApproved?: Prisma.EnumApprovalStatusFilter<"Venue"> | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -248,7 +248,7 @@ export type VenueWhereUniqueInput = Prisma.AtLeast<{
   city?: Prisma.StringFilter<"Venue"> | string
   images?: Prisma.StringNullableListFilter<"Venue">
   ownerId?: Prisma.StringFilter<"Venue"> | string
-  isApproved?: Prisma.BoolFilter<"Venue"> | boolean
+  isApproved?: Prisma.EnumApprovalStatusFilter<"Venue"> | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -282,7 +282,7 @@ export type VenueScalarWhereWithAggregatesInput = {
   city?: Prisma.StringWithAggregatesFilter<"Venue"> | string
   images?: Prisma.StringNullableListFilter<"Venue">
   ownerId?: Prisma.StringWithAggregatesFilter<"Venue"> | string
-  isApproved?: Prisma.BoolWithAggregatesFilter<"Venue"> | boolean
+  isApproved?: Prisma.EnumApprovalStatusWithAggregatesFilter<"Venue"> | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Venue"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Venue"> | Date | string
 }
@@ -294,7 +294,7 @@ export type VenueCreateInput = {
   address: string
   city: string
   images?: Prisma.VenueCreateimagesInput | string[]
-  isApproved?: boolean
+  isApproved?: $Enums.ApprovalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutVenuesInput
@@ -309,7 +309,7 @@ export type VenueUncheckedCreateInput = {
   city: string
   images?: Prisma.VenueCreateimagesInput | string[]
   ownerId: string
-  isApproved?: boolean
+  isApproved?: $Enums.ApprovalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   courts?: Prisma.CourtUncheckedCreateNestedManyWithoutVenueInput
@@ -322,7 +322,7 @@ export type VenueUpdateInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutVenuesNestedInput
@@ -337,7 +337,7 @@ export type VenueUncheckedUpdateInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courts?: Prisma.CourtUncheckedUpdateManyWithoutVenueNestedInput
@@ -351,7 +351,7 @@ export type VenueCreateManyInput = {
   city: string
   images?: Prisma.VenueCreateimagesInput | string[]
   ownerId: string
-  isApproved?: boolean
+  isApproved?: $Enums.ApprovalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -363,7 +363,7 @@ export type VenueUpdateManyMutationInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -376,7 +376,7 @@ export type VenueUncheckedUpdateManyInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -492,8 +492,8 @@ export type VenueUpdateimagesInput = {
   push?: string | string[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
+export type EnumApprovalStatusFieldUpdateOperationsInput = {
+  set?: $Enums.ApprovalStatus
 }
 
 export type VenueCreateNestedOneWithoutCourtsInput = {
@@ -517,7 +517,7 @@ export type VenueCreateWithoutOwnerInput = {
   address: string
   city: string
   images?: Prisma.VenueCreateimagesInput | string[]
-  isApproved?: boolean
+  isApproved?: $Enums.ApprovalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   courts?: Prisma.CourtCreateNestedManyWithoutVenueInput
@@ -530,7 +530,7 @@ export type VenueUncheckedCreateWithoutOwnerInput = {
   address: string
   city: string
   images?: Prisma.VenueCreateimagesInput | string[]
-  isApproved?: boolean
+  isApproved?: $Enums.ApprovalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   courts?: Prisma.CourtUncheckedCreateNestedManyWithoutVenueInput
@@ -573,7 +573,7 @@ export type VenueScalarWhereInput = {
   city?: Prisma.StringFilter<"Venue"> | string
   images?: Prisma.StringNullableListFilter<"Venue">
   ownerId?: Prisma.StringFilter<"Venue"> | string
-  isApproved?: Prisma.BoolFilter<"Venue"> | boolean
+  isApproved?: Prisma.EnumApprovalStatusFilter<"Venue"> | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Venue"> | Date | string
 }
@@ -585,7 +585,7 @@ export type VenueCreateWithoutCourtsInput = {
   address: string
   city: string
   images?: Prisma.VenueCreateimagesInput | string[]
-  isApproved?: boolean
+  isApproved?: $Enums.ApprovalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutVenuesInput
@@ -599,7 +599,7 @@ export type VenueUncheckedCreateWithoutCourtsInput = {
   city: string
   images?: Prisma.VenueCreateimagesInput | string[]
   ownerId: string
-  isApproved?: boolean
+  isApproved?: $Enums.ApprovalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -627,7 +627,7 @@ export type VenueUpdateWithoutCourtsInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutVenuesNestedInput
@@ -641,7 +641,7 @@ export type VenueUncheckedUpdateWithoutCourtsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -653,7 +653,7 @@ export type VenueCreateManyOwnerInput = {
   address: string
   city: string
   images?: Prisma.VenueCreateimagesInput | string[]
-  isApproved?: boolean
+  isApproved?: $Enums.ApprovalStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -665,7 +665,7 @@ export type VenueUpdateWithoutOwnerInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courts?: Prisma.CourtUpdateManyWithoutVenueNestedInput
@@ -678,7 +678,7 @@ export type VenueUncheckedUpdateWithoutOwnerInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courts?: Prisma.CourtUncheckedUpdateManyWithoutVenueNestedInput
@@ -691,7 +691,7 @@ export type VenueUncheckedUpdateManyWithoutOwnerInput = {
   address?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   images?: Prisma.VenueUpdateimagesInput | string[]
-  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isApproved?: Prisma.EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -811,7 +811,7 @@ export type $VenuePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     city: string
     images: string[]
     ownerId: string
-    isApproved: boolean
+    isApproved: $Enums.ApprovalStatus
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["venue"]>
@@ -1246,7 +1246,7 @@ export interface VenueFieldRefs {
   readonly city: Prisma.FieldRef<"Venue", 'String'>
   readonly images: Prisma.FieldRef<"Venue", 'String[]'>
   readonly ownerId: Prisma.FieldRef<"Venue", 'String'>
-  readonly isApproved: Prisma.FieldRef<"Venue", 'Boolean'>
+  readonly isApproved: Prisma.FieldRef<"Venue", 'ApprovalStatus'>
   readonly createdAt: Prisma.FieldRef<"Venue", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Venue", 'DateTime'>
 }
