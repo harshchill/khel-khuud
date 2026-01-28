@@ -44,3 +44,18 @@ export { Prisma }
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model Venue
+ * 
+ */
+export type Venue = Prisma.VenueModel
+/**
+ * Model Court
+ * 
+ */
+export type Court = Prisma.CourtModel
+/**
+ * Model Booking
+ * 
+ */
+export type Booking = Prisma.BookingModel

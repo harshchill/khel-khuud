@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.3.0",
   "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "postgresql",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  password  String\n  name      String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\n// --------------------------------------------------------\n// 2. ENUMS\n// --------------------------------------------------------\nenum Role {\n  CUSTOMER\n  OWNER\n  ADMIN\n}\n\nenum BookingStatus {\n  PENDING // Payment initiated but not finished\n  CONFIRMED // Payment successful\n  CANCELLED // Refunded or user cancelled\n  COMPLETED // Event has passed\n}\n\nenum SportType {\n  BADMINTON\n  CRICKET\n  FOOTBALL\n  TENNIS\n  TABLE_TENNIS\n  BASKETBALL\n  SWIMMING\n  VOLLEYBALL\n  OTHER\n}\n\n// --------------------------------------------------------\n// 3. MODELS\n// --------------------------------------------------------\n\nmodel User {\n  id       String  @id @default(cuid())\n  email    String  @unique\n  password String\n  name     String\n  phone    String\n  avatar   String?\n  role     Role    @default(CUSTOMER)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  // RELATIONS for Owner\n  venues Venue[] @relation(\"OwnerVenues\")\n\n  // Relation for customers\n  bookings Booking[] // If user is a Customer\n}\n\nmodel Venue {\n  id          String   @id @default(cuid())\n  name        String\n  description String?  @db.Text\n  address     String\n  city        String\n  images      String[] // Array of image URLs\n\n  ownerId String\n  owner   User   @relation(\"OwnerVenues\", fields: [ownerId], references: [id])\n\n  isApproved Boolean @default(false)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  // RELATIONS\n  courts Court[]\n}\n\nmodel Court {\n  id           String    @id @default(cuid())\n  name         String // e.g., \"Court 1\", \"Turf A\"\n  sportType    SportType\n  pricePerHour Decimal   @db.Decimal(10, 2)\n\n  venueId String\n  venue   Venue  @relation(fields: [venueId], references: [id], onDelete: Cascade)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  // RELATIONS\n  bookings Booking[]\n}\n\nmodel Booking {\n  id String @id @default(cuid())\n\n  // --- SLOT LOGIC START ---\n  date   DateTime @db.Date // Stores the specific day (e.g. 2026-01-31)\n  slotId String // The fixed ID of the slot (e.g. \"SLOT_18_21\")\n  // --- SLOT LOGIC END ---\n\n  totalPrice Decimal       @db.Decimal(10, 2)\n  status     BookingStatus @default(CONFIRMED)\n\n  userId String\n  user   User   @relation(fields: [userId], references: [id])\n\n  courtId String\n  court   Court  @relation(fields: [courtId], references: [id])\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@unique([courtId, date, slotId])\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"Role\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"venues\",\"kind\":\"object\",\"type\":\"Venue\",\"relationName\":\"OwnerVenues\"},{\"name\":\"bookings\",\"kind\":\"object\",\"type\":\"Booking\",\"relationName\":\"BookingToUser\"}],\"dbName\":null},\"Venue\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"address\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"city\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"images\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ownerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"owner\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"OwnerVenues\"},{\"name\":\"isApproved\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"courts\",\"kind\":\"object\",\"type\":\"Court\",\"relationName\":\"CourtToVenue\"}],\"dbName\":null},\"Court\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sportType\",\"kind\":\"enum\",\"type\":\"SportType\"},{\"name\":\"pricePerHour\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"venueId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"venue\",\"kind\":\"object\",\"type\":\"Venue\",\"relationName\":\"CourtToVenue\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"bookings\",\"kind\":\"object\",\"type\":\"Booking\",\"relationName\":\"BookingToCourt\"}],\"dbName\":null},\"Booking\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"date\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"slotId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"totalPrice\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"BookingStatus\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"BookingToUser\"},{\"name\":\"courtId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"court\",\"kind\":\"object\",\"type\":\"Court\",\"relationName\":\"BookingToCourt\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -185,6 +185,36 @@ export interface PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.venue`: Exposes CRUD operations for the **Venue** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Venues
+    * const venues = await prisma.venue.findMany()
+    * ```
+    */
+  get venue(): Prisma.VenueDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.court`: Exposes CRUD operations for the **Court** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Courts
+    * const courts = await prisma.court.findMany()
+    * ```
+    */
+  get court(): Prisma.CourtDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.booking`: Exposes CRUD operations for the **Booking** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Bookings
+    * const bookings = await prisma.booking.findMany()
+    * ```
+    */
+  get booking(): Prisma.BookingDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {

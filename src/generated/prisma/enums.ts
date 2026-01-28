@@ -9,7 +9,35 @@
 * 🟢 You can import this file directly.
 */
 
+export const Role = {
+  CUSTOMER: 'CUSTOMER',
+  OWNER: 'OWNER',
+  ADMIN: 'ADMIN'
+} as const
+
+export type Role = (typeof Role)[keyof typeof Role]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const BookingStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  CANCELLED: 'CANCELLED',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
+
+
+export const SportType = {
+  BADMINTON: 'BADMINTON',
+  CRICKET: 'CRICKET',
+  FOOTBALL: 'FOOTBALL',
+  TENNIS: 'TENNIS',
+  TABLE_TENNIS: 'TABLE_TENNIS',
+  BASKETBALL: 'BASKETBALL',
+  SWIMMING: 'SWIMMING',
+  VOLLEYBALL: 'VOLLEYBALL',
+  OTHER: 'OTHER'
+} as const
+
+export type SportType = (typeof SportType)[keyof typeof SportType]

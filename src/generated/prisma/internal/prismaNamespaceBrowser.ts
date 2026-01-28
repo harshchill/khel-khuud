@@ -51,7 +51,10 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  User: 'User'
+  User: 'User',
+  Venue: 'Venue',
+  Court: 'Court',
+  Booking: 'Booking'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -75,11 +78,58 @@ export const UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   name: 'name',
+  phone: 'phone',
+  avatar: 'avatar',
+  role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const VenueScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  address: 'address',
+  city: 'city',
+  images: 'images',
+  ownerId: 'ownerId',
+  isApproved: 'isApproved',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VenueScalarFieldEnum = (typeof VenueScalarFieldEnum)[keyof typeof VenueScalarFieldEnum]
+
+
+export const CourtScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  sportType: 'sportType',
+  pricePerHour: 'pricePerHour',
+  venueId: 'venueId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CourtScalarFieldEnum = (typeof CourtScalarFieldEnum)[keyof typeof CourtScalarFieldEnum]
+
+
+export const BookingScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  slotId: 'slotId',
+  totalPrice: 'totalPrice',
+  status: 'status',
+  userId: 'userId',
+  courtId: 'courtId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]
 
 
 export const SortOrder = {
